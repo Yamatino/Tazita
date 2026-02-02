@@ -119,7 +119,9 @@ export function useCoffeeData() {
   };
 
   const addCoffee = useCallback((type: CoffeeType, date: string, notes?: string) => {
-    const selectedDate = new Date(date);
+    // Parse the date string (YYYY-MM-DD) and create a date in local timezone
+    const [year, month, day] = date.split('-').map(Number);
+    const selectedDate = new Date(year, month - 1, day); // month is 0-indexed in JS
     const now = new Date();
     // Combine selected date with current time
     selectedDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
