@@ -26,12 +26,12 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser }
     e.preventDefault();
     
     if (!inputUsername.trim()) {
-      setError('Please enter a username');
+      setError('Por favor ingresa un nombre de usuario');
       return;
     }
 
     if (inputUsername.trim().toLowerCase() === currentUsername?.toLowerCase()) {
-      setError('This is already your current username');
+      setError('Este ya es tu usuario actual');
       return;
     }
 
@@ -50,7 +50,7 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser }
         setInputUsername('');
       }
     } catch (err) {
-      setError('Error checking username. Please try again.');
+      setError('Error al verificar el usuario. Por favor intenta de nuevo.');
     } finally {
       setIsChecking(false);
     }
@@ -92,7 +92,7 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser }
                 <User className="h-5 w-5 text-[#5C4A3A]" />
               </div>
               <div>
-                <p className="text-xs text-[#8B6F47]">Current user</p>
+                <p className="text-xs text-[#8B6F47]">Usuario actual</p>
                 <p className="text-lg font-bold text-[#5C4A3A]">{currentUsername}</p>
               </div>
             </div>
@@ -103,7 +103,7 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser }
               className="text-[#8B6F47] hover:text-[#5C4A3A] hover:bg-white/50"
             >
               <LogOut className="h-4 w-4 mr-1" />
-              Exit
+              Salir
             </Button>
           </div>
         </motion.div>
@@ -113,12 +113,12 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser }
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <Label htmlFor="username" className="text-[#5C4A3A] font-medium">
-            {currentUsername ? 'Switch to different user:' : 'Enter your username:'}
+            {currentUsername ? 'Cambiar a otro usuario:' : 'Ingresa tu nombre de usuario:'}
           </Label>
           <Input
             id="username"
             type="text"
-            placeholder="e.g., maria, coffee_lover, etc."
+            placeholder="ej: maria, amante_del_cafe, etc."
             value={inputUsername}
             onChange={(e) => {
               setInputUsername(e.target.value);
@@ -145,9 +145,9 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser }
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-2 text-green-600 text-sm"
           >
-            <Check className="h-4 w-4" />
-            Username set successfully!
-          </motion.div>
+        <Check className="h-4 w-4" />
+        ¡Usuario configurado exitosamente!
+      </motion.div>
         )}
 
         <Button
@@ -155,12 +155,12 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser }
           disabled={isChecking || !inputUsername.trim()}
           className="w-full rounded-xl bg-[#FFE4A1] hover:bg-[#FFD93D] text-[#5C4A3A] font-bold"
         >
-          {isChecking ? 'Checking...' : currentUsername ? 'Switch User' : 'Start Tracking'}
+          {isChecking ? 'Verificando...' : currentUsername ? 'Cambiar Usuario' : 'Comenzar'}
         </Button>
       </form>
 
       <p className="text-xs text-[#8B6F47] text-center">
-        Your data is automatically saved and synced across devices.
+        Tus datos se guardan y sincronizan automáticamente entre dispositivos.
       </p>
 
       {/* Confirmation Dialog */}
@@ -184,20 +184,20 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser }
               <div className="text-center">
                 <div className="text-5xl mb-4">🤔</div>
                 <h3 className="text-xl font-bold text-[#5C4A3A] mb-2">
-                  Username already exists!
+                  ¡El usuario ya existe!
                 </h3>
                 <p className="text-[#8B6F47] mb-6">
-                  The username "{inputUsername}" already has data. What would you like to do?
+                  El usuario "{inputUsername}" ya tiene datos. ¿Qué te gustaría hacer?
                 </p>
 
                 {existingData && (
                   <div className="bg-[#FFF8E7] rounded-xl p-3 mb-4 text-left">
-                    <p className="text-xs text-[#8B6F47] mb-1">Existing data:</p>
+                    <p className="text-xs text-[#8B6F47] mb-1">Datos existentes:</p>
                     <p className="text-sm text-[#5C4A3A]">
-                      ☕ {existingData.entries.length} coffees recorded
+                      ☕ {existingData.entries.length} cafés registrados
                     </p>
                     <p className="text-xs text-[#8B6F47]">
-                      Since {new Date(existingData.createdAt).toLocaleDateString()}
+                      Desde {new Date(existingData.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 )}
@@ -207,7 +207,7 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser }
                     onClick={handleLoadExisting}
                     className="w-full rounded-xl bg-[#FFE4A1] hover:bg-[#FFD93D] text-[#5C4A3A] font-bold"
                   >
-                    Load Existing Data
+                    Cargar Datos Existentes
                   </Button>
                   
                   <Button
@@ -215,7 +215,7 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser }
                     onClick={handleCreateNew}
                     className="w-full rounded-xl border-[#E8DCC8]"
                   >
-                    Create New Account
+                    Crear Nueva Cuenta
                   </Button>
                   
                   <Button
@@ -223,7 +223,7 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser }
                     onClick={() => setShowConfirmDialog(false)}
                     className="w-full"
                   >
-                    Cancel
+                    Cancelar
                   </Button>
                 </div>
               </div>

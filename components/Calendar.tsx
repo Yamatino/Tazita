@@ -13,11 +13,11 @@ interface CalendarProps {
 }
 
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 ];
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const WEEKDAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
 // Color coding based on coffee count
 const getDayColor = (count: number): string => {
@@ -222,9 +222,10 @@ export function Calendar({ entries, onDayClick, onDayLongPress }: CalendarProps)
                   relative cursor-pointer transition-all duration-200 select-none
                   ${today ? 'ring-2 ring-[#5C4A3A] shadow-md' : ''}
                 `}
+                data-today={today ? 'true' : 'false'}
                 style={{
-                  backgroundColor: today ? '#FFE4A1' : (dayColor || '#F5EDE0'),
-                  border: hasEntries && !today ? '1px solid #E8DCC8' : 'none'
+                  backgroundColor: dayColor || '#F5EDE0',
+                  border: hasEntries ? '1px solid #E8DCC8' : 'none'
                 }}
               >
                 <span className={`
@@ -268,18 +269,22 @@ export function Calendar({ entries, onDayClick, onDayLongPress }: CalendarProps)
 
       {/* Legend */}
       <div className="mt-4 pt-4 border-t border-[#E8DCC8]">
-        <div className="flex items-center justify-center gap-4 text-xs text-[#8B6F47]">
+        <div className="flex items-center justify-center gap-3 text-xs text-[#8B6F47] flex-wrap">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFF8E7' }} />
-            <span>1 coffee</span>
+            <span>1 café</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFE4A1' }} />
-            <span>2 coffees</span>
+            <span>2 cafés</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFD1DC' }} />
-            <span>3+ coffees</span>
+            <span>3+ cafés</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded ring-2 ring-[#5C4A3A]" />
+            <span>Hoy</span>
           </div>
         </div>
       </div>

@@ -103,8 +103,8 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
       if (navigator.share && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: 'My Coffee Stats ☕',
-          text: `Check out my coffee journey with Tazita! 🍮\nTracked ${totalEntries} coffees so far.`
+          title: 'Mis Estadísticas de Café ☕',
+          text: `¡Mira mi viaje del café con Tazita! 🍮\n${totalEntries} cafés registrados hasta ahora.`
         });
       } else {
         // Fallback to download
@@ -141,7 +141,7 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
         className="rounded-xl border-[#E8DCC8] hover:bg-[#FFE4A1]/30"
       >
         <Share2 className="h-4 w-4 mr-2" />
-        Share
+        Compartir
       </Button>
 
       <AnimatePresence>
@@ -163,7 +163,7 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
             >
               <div className="p-6 h-full flex flex-col">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold text-[#5C4A3A]">Share Your Journey</h3>
+                  <h3 className="text-xl font-bold text-[#5C4A3A]">Comparte tu Viaje</h3>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -212,29 +212,29 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
                       <div className="flex-1 grid grid-cols-2 gap-3">
                         <div className="bg-white/95 rounded-2xl p-4 flex flex-col items-center justify-center shadow-md border border-[#FFE4A1]/50">
                           <p className="text-4xl font-bold text-[#5C4A3A]">{today}</p>
-                          <p className="text-xs text-[#8B6F47] font-medium mt-1">Today</p>
+                          <p className="text-xs text-[#8B6F47] font-medium mt-1">Hoy</p>
                         </div>
                         
                         <div className="bg-white/95 rounded-2xl p-4 flex flex-col items-center justify-center shadow-md border border-[#FFE4A1]/50">
                           <p className="text-4xl font-bold text-[#5C4A3A]">{month}</p>
-                          <p className="text-xs text-[#8B6F47] font-medium mt-1">This Month</p>
+                          <p className="text-xs text-[#8B6F47] font-medium mt-1">Este Mes</p>
                         </div>
                         
                         <div className="bg-white/95 rounded-2xl p-4 flex flex-col items-center justify-center shadow-md border border-[#FFE4A1]/50">
                           <p className="text-4xl font-bold text-[#5C4A3A]">{year}</p>
-                          <p className="text-xs text-[#8B6F47] font-medium mt-1">This Year</p>
+                          <p className="text-xs text-[#8B6F47] font-medium mt-1">Este Año</p>
                         </div>
                         
                         <div className="bg-white/95 rounded-2xl p-4 flex flex-col items-center justify-center shadow-md border border-[#FFE4A1]/50">
                           <p className="text-4xl font-bold text-[#5C4A3A]">{streak}</p>
-                          <p className="text-xs text-[#8B6F47] font-medium mt-1">Day Streak 🔥</p>
+                          <p className="text-xs text-[#8B6F47] font-medium mt-1">Racha 🔥</p>
                         </div>
                       </div>
 
                       {/* Favorites */}
                       {sortedTypes.length > 0 && (
                         <div className="mt-4 bg-white/90 rounded-2xl p-4 shadow-md border border-[#FFE4A1]/50">
-                          <p className="text-xs text-[#8B6F47] mb-2 text-center font-medium">My Favorites</p>
+                          <p className="text-xs text-[#8B6F47] mb-2 text-center font-medium">Mis Favoritos</p>
                           <div className="flex justify-center gap-4">
                             {sortedTypes.map(([type, count]) => {
                               const info = getCoffeeTypeInfo(type as CoffeeType);
@@ -253,7 +253,7 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
                       <div className="mt-auto pt-4 text-center">
                         <div className="flex items-center justify-center gap-1 text-[#8B6F47]">
                           <Sparkles className="h-3 w-3" />
-                          <p className="text-xs">Track your coffee with Tazita</p>
+                          <p className="text-xs">Rastrea tu café con Tazita</p>
                           <Sparkles className="h-3 w-3" />
                         </div>
                       </div>
@@ -270,7 +270,7 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
                       exit={{ opacity: 0, y: -10 }}
                       className="text-center mb-3"
                     >
-                      <p className="text-green-600 font-medium text-sm">✓ Image saved successfully!</p>
+                      <p className="text-green-600 font-medium text-sm">✓ ¡Imagen guardada exitosamente!</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -284,7 +284,7 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
                     className="rounded-xl h-12 border-[#E8DCC8] hover:bg-[#FFE4A1]/30"
                   >
                     <Download className="h-4 w-4 mr-2" />
-                    {isGenerating ? 'Saving...' : 'Save'}
+                    {isGenerating ? 'Guardando...' : 'Guardar'}
                   </Button>
                   
                   <Button
@@ -293,7 +293,7 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
                     className="rounded-xl h-12 bg-[#FFE4A1] hover:bg-[#FFD93D] text-[#5C4A3A] font-bold"
                   >
                     <Share2 className="h-4 w-4 mr-2" />
-                    {isGenerating ? 'Sharing...' : 'Share'}
+                    {isGenerating ? 'Compartiendo...' : 'Compartir'}
                   </Button>
                 </div>
               </div>

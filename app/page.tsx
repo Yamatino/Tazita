@@ -94,8 +94,8 @@ export default function Home() {
             >
               🍮
             </motion.div>
-            <h1 className="text-2xl font-bold text-[#5C4A3A] mb-2">Welcome to Tazita</h1>
-            <p className="text-[#8B6F47]">Your personal coffee tracker ☕</p>
+            <h1 className="text-2xl font-bold text-[#5C4A3A] mb-2">Bienvenido a Tazita</h1>
+            <p className="text-[#8B6F47]">Tu rastreador personal de café ☕</p>
           </div>
 
           <UsernameManager
@@ -136,7 +136,7 @@ export default function Home() {
                     transition={{ duration: 1, repeat: Infinity }}
                     className="text-[10px] text-[#D4A574]"
                   >
-                    syncing...
+                    sincronizando...
                   </motion.span>
                 )}
               </div>
@@ -168,7 +168,7 @@ export default function Home() {
             className="space-y-4"
           >
             <div className="bg-white rounded-2xl p-4 shadow-lg">
-              <h2 className="text-lg font-bold text-[#5C4A3A] mb-4">Settings ⚙️</h2>
+              <h2 className="text-lg font-bold text-[#5C4A3A] mb-4">Configuración ⚙️</h2>
               <UsernameManager
                 currentUsername={username}
                 onSetUsername={setUser}
@@ -177,12 +177,12 @@ export default function Home() {
             </div>
             
             <div className="bg-white rounded-2xl p-4 shadow-lg">
-              <h3 className="font-bold text-[#5C4A3A] mb-3">About</h3>
+              <h3 className="font-bold text-[#5C4A3A] mb-3">Acerca de</h3>
               <p className="text-sm text-[#8B6F47]">
-                Tazita v1.0 - Made with ☕ and 🍮
+                Tazita v1.0 - Hecho con ☕ y 🍮
               </p>
               <p className="text-xs text-[#D4A574] mt-2">
-                Pompompurin Theme 💛
+                Tema Pompompurin 💛
               </p>
             </div>
           </motion.div>

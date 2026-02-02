@@ -17,7 +17,7 @@ export function DayDetailsModal({ isOpen, onClose, date, entries, onDeleteEntry 
   if (!date) return null;
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('es-ES', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -26,7 +26,7 @@ export function DayDetailsModal({ isOpen, onClose, date, entries, onDeleteEntry 
   };
 
   const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('en-US', {
+    return new Date(timestamp).toLocaleTimeString('es-ES', {
       hour: '2-digit',
       minute: '2-digit'
     });
@@ -82,7 +82,7 @@ export function DayDetailsModal({ isOpen, onClose, date, entries, onDeleteEntry 
                   className="text-center py-12"
                 >
                   <div className="text-4xl mb-4">😴</div>
-                  <p className="text-[#8B6F47]">No coffees recorded for this day</p>
+                  <p className="text-[#8B6F47]">No hay cafés registrados para este día</p>
                 </motion.div>
               ) : (
                 <div className="space-y-3">
@@ -129,7 +129,7 @@ export function DayDetailsModal({ isOpen, onClose, date, entries, onDeleteEntry 
                   className="mt-6 pt-4 border-t border-[#E8DCC8]"
                 >
                   <p className="text-center text-[#5C4A3A] font-medium">
-                    Total: {entries.length} coffee{entries.length !== 1 ? 's' : ''} ☕
+                    Total: {entries.length} café{entries.length !== 1 ? 's' : ''} ☕
                   </p>
                 </motion.div>
               )}

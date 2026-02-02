@@ -119,10 +119,15 @@ export function useCoffeeData() {
   };
 
   const addCoffee = useCallback((type: CoffeeType, date: string, notes?: string) => {
+    const selectedDate = new Date(date);
+    const now = new Date();
+    // Combine selected date with current time
+    selectedDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+    
     const newEntry: CoffeeEntry = {
       id: generateId(),
       type,
-      timestamp: new Date().toISOString(),
+      timestamp: selectedDate.toISOString(),
       date,
       notes
     };
