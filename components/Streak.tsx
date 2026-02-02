@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Flame } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
 
 interface StreakProps {
   streak: number;
@@ -18,13 +19,17 @@ const MESSAGES = [
 ];
 
 export function Streak({ streak }: StreakProps) {
+  const { themeConfig } = useTheme();
   const message = MESSAGES.find(m => streak >= m.min && streak <= m.max) || MESSAGES[0];
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-gradient-to-r from-[#FFE4A1] to-[#FFD1DC] rounded-2xl p-4 shadow-lg"
+      className="rounded-2xl p-4 shadow-lg"
+      style={{ 
+        background: `linear-gradient(135deg, ${themeConfig.primary} 0%, ${themeConfig.secondary} 100%)` 
+      }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -34,18 +39,22 @@ export function Streak({ streak }: StreakProps) {
               rotate: [0, 5, -5, 0]
             }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="bg-white rounded-full p-2 shadow-md"
+            className="rounded-full p-2 shadow-md"
+            style={{ backgroundColor: '#FFFFFF' }}
           >
             <Flame className="h-6 w-6 text-orange-500" />
           </motion.div>
           
           <div>
-            <p className="text-sm text-[#5C4A3A] font-medium">{message.subtext}</p>
+            <p className="text-sm font-medium" style={{ color: themeConfig.text }}>
+              {message.subtext}
+            </p>
             <motion.h3 
               key={streak}
               initial={{ scale: 1.2 }}
               animate={{ scale: 1 }}
-              className="text-2xl font-bold text-[#5C4A3A]"
+              className="text-2xl font-bold"
+              style={{ color: themeConfig.text }}
             >
               {streak} {streak === 1 ? 'día' : 'días'} seguidos
             </motion.h3>
@@ -57,7 +66,9 @@ export function Streak({ streak }: StreakProps) {
           animate={{ opacity: 1, x: 0 }}
           className="text-right"
         >
-          <p className="text-lg font-bold text-[#5C4A3A]">{message.text}</p>
+          <p className="text-lg font-bold" style={{ color: themeConfig.text }}>
+            {message.text}
+          </p>
         </motion.div>
       </div>
 
@@ -78,7 +89,8 @@ export function Streak({ streak }: StreakProps) {
           <motion.span 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-[#5C4A3A] font-bold self-center ml-1"
+            className="font-bold self-center ml-1"
+            style={{ color: themeConfig.text }}
           >
             +{streak - 14}
           </motion.span>

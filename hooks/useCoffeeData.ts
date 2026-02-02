@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { CoffeeData, CoffeeEntry, CoffeeType, generateId } from '@/types/coffee';
-import { checkUsernameExists, getUserData, saveUserData } from '@/lib/supabase';
+import { CoffeeData, CoffeeEntry, CoffeeType, Theme, generateId } from '@/types/coffee';
+import { checkUsernameExists, getUserData, saveUserData, getUserTheme, saveUserTheme } from '@/lib/supabase';
 
 const USERNAME_KEY = 'tazita-username';
+const THEME_KEY = 'tazita-theme';
 
 export function useCoffeeData() {
   const [data, setData] = useState<CoffeeData | null>(null);
@@ -42,7 +43,11 @@ export function useCoffeeData() {
 
   const loadUserData = async (user: string) => {
     try {
-      const userData = await getUserData(user);
+      const [userData, userTheme] = await Promise.all([
+        getUserData(user),
+        getUserTheme(user)
+      ]);
+      
       if (userData) {
         setData(userData);
       } else {
@@ -54,6 +59,11 @@ export function useCoffeeData() {
         };
         setData(newData);
         await saveUserData(user, newData);
+      }
+
+      // Load user's theme if available
+      if (userTheme) {
+        localStorage.setItem(THEME_KEY, userTheme);
       }
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -95,7 +105,7 @@ export function useCoffeeData() {
     return newData;
   };
 
-  const setUser = async (newUsername: string): Promise<{ exists: boolean; data?: CoffeeData }> => {
+  const setUser = async (newUsername: string, theme?: Theme): Promise<{ exists: boolean; data?: CoffeeData }> => {
     const normalizedUsername = newUsername.toLowerCase().trim();
     const exists = await checkUsernameExists(normalizedUsername);
     
@@ -109,6 +119,17 @@ export function useCoffeeData() {
     
     localStorage.setItem(USERNAME_KEY, normalizedUsername);
     setUsername(normalizedUsername);
+    
+    // Save theme if provided
+    if (theme) {
+      localStorage.setItem(THEME_KEY, theme);
+      try {
+        await saveUserTheme(normalizedUsername, theme);
+      } catch (error) {
+        console.error('Error saving theme:', error);
+      }
+    }
+    
     return { exists: false };
   };
 

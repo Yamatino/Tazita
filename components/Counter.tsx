@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Coffee } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
 
 interface CounterProps {
   today: number;
@@ -12,6 +13,7 @@ interface CounterProps {
 
 function AnimatedNumber({ value }: { value: number }) {
   const [displayValue, setDisplayValue] = useState(0);
+  const { themeConfig } = useTheme();
 
   useEffect(() => {
     const duration = 1000;
@@ -36,8 +38,8 @@ function AnimatedNumber({ value }: { value: number }) {
   return (
     <motion.span
       key={value}
-      initial={{ scale: 1.2, color: '#FFE4A1' }}
-      animate={{ scale: 1, color: '#5C4A3A' }}
+      initial={{ scale: 1.2, color: themeConfig.primary }}
+      animate={{ scale: 1, color: themeConfig.text }}
       transition={{ duration: 0.3 }}
       className="inline-block"
     >
@@ -47,10 +49,12 @@ function AnimatedNumber({ value }: { value: number }) {
 }
 
 export function Counter({ today, month, year }: CounterProps) {
+  const { themeConfig } = useTheme();
+  
   const counters = [
-    { label: 'Hoy', value: today, icon: '☀️', color: '#FFE4A1' },
-    { label: 'Este mes', value: month, icon: '📅', color: '#FFD1DC' },
-    { label: 'Este año', value: year, icon: '📊', color: '#D4A574' }
+    { label: 'Hoy', value: today, icon: '☀️', color: themeConfig.primary },
+    { label: 'Este mes', value: month, icon: '📅', color: themeConfig.secondary },
+    { label: 'Este año', value: year, icon: '📊', color: themeConfig.accent }
   ];
 
   return (
@@ -62,7 +66,8 @@ export function Counter({ today, month, year }: CounterProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
           whileHover={{ scale: 1.02, y: -2 }}
-          className="bg-white rounded-2xl p-4 shadow-md hover:shadow-lg transition-all duration-300"
+          className="rounded-2xl p-4 shadow-md hover:shadow-lg transition-all duration-300"
+          style={{ backgroundColor: '#FFFFFF' }}
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-2xl">{counter.icon}</span>
@@ -70,15 +75,17 @@ export function Counter({ today, month, year }: CounterProps) {
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
             >
-              <Coffee className="h-4 w-4 text-[#D4A574]" />
+              <Coffee className="h-4 w-4" style={{ color: themeConfig.accent }} />
             </motion.div>
           </div>
           
-          <div className="text-3xl font-bold text-[#5C4A3A]">
+          <div className="text-3xl font-bold" style={{ color: themeConfig.text }}>
             <AnimatedNumber value={counter.value} />
           </div>
           
-          <p className="text-xs text-[#8B6F47] mt-1 font-medium">{counter.label}</p>
+          <p className="text-xs mt-1 font-medium" style={{ color: themeConfig.accent }}>
+            {counter.label}
+          </p>
         </motion.div>
       ))}
     </div>

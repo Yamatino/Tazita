@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, X, User } from 'lucide-react';
+import { Settings, X, User, BarChart3, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCoffeeData } from '@/hooks/useCoffeeData';
 import { CoffeeType } from '@/types/coffee';
+import { ThemeProvider } from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import { AddCoffeeButton } from '@/components/AddCoffeeButton';
 import { CoffeeTypeModal } from '@/components/CoffeeTypeModal';
 import { Calendar } from '@/components/Calendar';
@@ -15,10 +17,14 @@ import { Stats } from '@/components/Stats';
 import { UsernameManager } from '@/components/UsernameManager';
 import { ShareStats } from '@/components/ShareStats';
 import { DayDetailsModal } from '@/components/DayDetailsModal';
+import { ThemeSelector } from '@/components/ThemeSelector';
+import { HabitosTab } from '@/components/HabitosTab';
 
-export default function Home() {
+type Tab = 'main' | 'habitos' | 'settings';
+
+function AppContent() {
+  const [activeTab, setActiveTab] = useState<Tab>('main');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isDayDetailsOpen, setIsDayDetailsOpen] = useState(false);
   
@@ -37,6 +43,8 @@ export default function Home() {
     getEntriesForDate
   } = useCoffeeData();
 
+  const { themeConfig } = useTheme();
+
   const stats = getStats();
   const streak = getStreak();
   const entriesByType = getEntriesByType();
@@ -52,7 +60,6 @@ export default function Home() {
   };
 
   const handleDayLongPress = (date: Date) => {
-    // Open day details on long press as well
     setSelectedDate(date);
     setIsDayDetailsOpen(true);
   };
@@ -65,7 +72,10 @@ export default function Home() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: themeConfig.background }}
+      >
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
@@ -80,11 +90,15 @@ export default function Home() {
   // Show username setup if no username
   if (!username) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div 
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{ backgroundColor: themeConfig.background }}
+      >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-white rounded-3xl p-8 shadow-xl max-w-sm w-full"
+          className="rounded-3xl p-8 shadow-xl max-w-sm w-full"
+          style={{ backgroundColor: '#FFFFFF' }}
         >
           <div className="text-center mb-6">
             <motion.div
@@ -92,16 +106,19 @@ export default function Home() {
               transition={{ duration: 2, repeat: Infinity }}
               className="text-6xl mb-4"
             >
-              🍮
+              {themeConfig.emoji}
             </motion.div>
-            <h1 className="text-2xl font-bold text-[#5C4A3A] mb-2">Bienvenido a Tazita</h1>
-            <p className="text-[#8B6F47]">Tu rastreador personal de café ☕</p>
+            <h1 className="text-2xl font-bold mb-2" style={{ color: themeConfig.text }}>
+              Bienvenido a Tazita
+            </h1>
+            <p style={{ color: themeConfig.accent }}>Tu rastreador personal de café ☕</p>
           </div>
 
           <UsernameManager
             currentUsername={username}
             onSetUsername={setUser}
             onSwitchUser={switchUser}
+            isFirstSetup={true}
           />
         </motion.div>
       </div>
@@ -109,12 +126,16 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen pb-24">
+    <main className="min-h-screen pb-24" style={{ backgroundColor: themeConfig.background }}>
       {/* Header */}
       <motion.header
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="sticky top-0 z-40 bg-[#FFF8E7]/90 backdrop-blur-md border-b border-[#E8DCC8] px-4 py-3"
+        className="sticky top-0 z-40 backdrop-blur-md border-b px-4 py-3"
+        style={{ 
+          backgroundColor: `${themeConfig.background}E6`,
+          borderColor: themeConfig.border 
+        }}
       >
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -123,18 +144,19 @@ export default function Home() {
               transition={{ duration: 4, repeat: Infinity }}
               className="text-3xl"
             >
-              🍮
+              {themeConfig.emoji}
             </motion.div>
             <div>
-              <h1 className="text-xl font-bold text-[#5C4A3A]">Tazita</h1>
+              <h1 className="text-xl font-bold" style={{ color: themeConfig.text }}>Tazita</h1>
               <div className="flex items-center gap-1">
-                <User className="h-3 w-3 text-[#8B6F47]" />
-                <p className="text-xs text-[#8B6F47]">{username}</p>
+                <User className="h-3 w-3" style={{ color: themeConfig.accent }} />
+                <p className="text-xs" style={{ color: themeConfig.accent }}>{username}</p>
                 {isSyncing && (
                   <motion.span
                     animate={{ opacity: [0.5, 1, 0.5] }}
                     transition={{ duration: 1, repeat: Infinity }}
-                    className="text-[10px] text-[#D4A574]"
+                    className="text-[10px]"
+                    style={{ color: themeConfig.accent }}
                   >
                     sincronizando...
                   </motion.span>
@@ -143,109 +165,167 @@ export default function Home() {
             </div>
           </div>
           
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowSettings(!showSettings)}
-            className="rounded-full hover:bg-[#FFE4A1]/30"
-          >
-            {showSettings ? (
-              <X className="h-5 w-5 text-[#5C4A3A]" />
-            ) : (
-              <Settings className="h-5 w-5 text-[#5C4A3A]" />
-            )}
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setActiveTab(activeTab === 'habitos' ? 'main' : 'habitos')}
+              className={`rounded-full transition-all duration-300 ${
+                activeTab === 'habitos' ? '' : 'hover:bg-opacity-30'
+              }`}
+              style={{
+                backgroundColor: activeTab === 'habitos' ? themeConfig.primary : 'transparent',
+                color: themeConfig.text
+              }}
+            >
+              <BarChart3 className="h-5 w-5" />
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setActiveTab(activeTab === 'settings' ? 'main' : 'settings')}
+              className={`rounded-full transition-all duration-300 ${
+                activeTab === 'settings' ? '' : 'hover:bg-opacity-30'
+              }`}
+              style={{
+                backgroundColor: activeTab === 'settings' ? themeConfig.primary : 'transparent',
+                color: themeConfig.text
+              }}
+            >
+              {activeTab === 'settings' ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Settings className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
         </div>
       </motion.header>
 
       {/* Main Content */}
       <div className="max-w-md mx-auto px-4 pt-6 space-y-6">
-        {showSettings ? (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-4"
-          >
-            <div className="bg-white rounded-2xl p-4 shadow-lg">
-              <h2 className="text-lg font-bold text-[#5C4A3A] mb-4">Configuración ⚙️</h2>
-              <UsernameManager
-                currentUsername={username}
-                onSetUsername={setUser}
-                onSwitchUser={switchUser}
-              />
-            </div>
-            
-            <div className="bg-white rounded-2xl p-4 shadow-lg">
-              <h3 className="font-bold text-[#5C4A3A] mb-3">Acerca de</h3>
-              <p className="text-sm text-[#8B6F47]">
-                Tazita v1.0 - Hecho con ☕ y 🍮
-              </p>
-              <p className="text-xs text-[#D4A574] mt-2">
-                Tema Pompompurin 💛
-              </p>
-            </div>
-          </motion.div>
-        ) : (
-          <>
-            {/* Counters */}
-            <Counter 
-              today={stats.today} 
-              month={stats.month} 
-              year={stats.year} 
-            />
-
-            {/* Streak */}
-            <Streak streak={streak} />
-
-            {/* Calendar */}
+        <AnimatePresence mode="wait">
+          {activeTab === 'settings' ? (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              key="settings"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-4"
             >
-              <Calendar 
-                entries={data?.entries || []}
-                onDayClick={handleDayClick}
-                onDayLongPress={handleDayLongPress}
-              />
+              <div 
+                className="rounded-2xl p-4 shadow-lg"
+                style={{ backgroundColor: '#FFFFFF' }}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <Settings className="h-5 w-5" style={{ color: themeConfig.accent }} />
+                  <h2 className="text-lg font-bold" style={{ color: themeConfig.text }}>Configuración ⚙️</h2>
+                </div>
+                
+                <UsernameManager
+                  currentUsername={username}
+                  onSetUsername={setUser}
+                  onSwitchUser={switchUser}
+                />
+              </div>
+              
+              <div 
+                className="rounded-2xl p-4 shadow-lg"
+                style={{ backgroundColor: '#FFFFFF' }}
+              >
+                <ThemeSelector />
+              </div>
+              
+              <div 
+                className="rounded-2xl p-4 shadow-lg"
+                style={{ backgroundColor: '#FFFFFF' }}
+              >
+                <h3 className="font-bold mb-3" style={{ color: themeConfig.text }}>Acerca de</h3>
+                <p className="text-sm" style={{ color: themeConfig.accent }}>
+                  Tazita v1.0 - Hecho con ☕ y {themeConfig.emoji}
+                </p>
+                <p className="text-xs mt-2" style={{ color: themeConfig.accent, opacity: 0.7 }}>
+                  Tema {themeConfig.name}
+                </p>
+              </div>
             </motion.div>
-
-            {/* Stats */}
+          ) : activeTab === 'habitos' ? (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              key="habitos"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
             >
-              <Stats 
-                entriesByType={entriesByType} 
-                totalEntries={totalEntries} 
-              />
+              <HabitosTab entries={data?.entries || []} />
             </motion.div>
-
-            {/* Share Button */}
+          ) : (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="flex justify-center"
+              key="main"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="space-y-6"
             >
-              <ShareStats
-                today={stats.today}
-                month={stats.month}
-                year={stats.year}
-                streak={streak}
-                entriesByType={entriesByType}
-                totalEntries={totalEntries}
-                username={username}
+              {/* Counters */}
+              <Counter 
+                today={stats.today} 
+                month={stats.month} 
+                year={stats.year} 
               />
+
+              {/* Streak */}
+              <Streak streak={streak} />
+
+              {/* Calendar */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Calendar 
+                  entries={data?.entries || []}
+                  onDayClick={handleDayClick}
+                  onDayLongPress={handleDayLongPress}
+                />
+              </motion.div>
+
+              {/* Stats */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Stats 
+                  entriesByType={entriesByType} 
+                  totalEntries={totalEntries} 
+                />
+              </motion.div>
+
+              {/* Share Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex justify-center"
+              >
+                <ShareStats
+                  today={stats.today}
+                  month={stats.month}
+                  year={stats.year}
+                  streak={streak}
+                  entriesByType={entriesByType}
+                  totalEntries={totalEntries}
+                  username={username}
+                />
+              </motion.div>
             </motion.div>
-          </>
-        )}
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Add Coffee Button */}
-      {!showSettings && (
+      {activeTab === 'main' && (
         <AddCoffeeButton onClick={() => setIsModalOpen(true)} />
       )}
 
@@ -265,5 +345,13 @@ export default function Home() {
         onDeleteEntry={handleDeleteEntry}
       />
     </main>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <ThemeProvider username={null}>
+      <AppContent />
+    </ThemeProvider>
   );
 }

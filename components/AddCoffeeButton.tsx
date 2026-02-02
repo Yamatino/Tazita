@@ -3,12 +3,15 @@
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTheme } from '@/context/ThemeContext';
 
 interface AddCoffeeButtonProps {
   onClick: () => void;
 }
 
 export function AddCoffeeButton({ onClick }: AddCoffeeButtonProps) {
+  const { themeConfig } = useTheme();
+  
   return (
     <motion.div
       className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
@@ -34,7 +37,12 @@ export function AddCoffeeButton({ onClick }: AddCoffeeButtonProps) {
         <Button
           onClick={onClick}
           size="lg"
-          className="h-16 w-16 rounded-full bg-[#FFE4A1] hover:bg-[#FFD93D] text-[#5C4A3A] shadow-lg hover:shadow-xl transition-all duration-300 border-4 border-white"
+          className="h-16 w-16 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-4"
+          style={{
+            backgroundColor: themeConfig.primary,
+            color: themeConfig.text,
+            borderColor: '#FFFFFF'
+          }}
         >
           <motion.div
             whileHover={{ rotate: 90 }}
@@ -74,7 +82,7 @@ export function AddCoffeeButton({ onClick }: AddCoffeeButtonProps) {
           delay: 0.5
         }}
       >
-        🍮
+        {themeConfig.emoji}
       </motion.div>
     </motion.div>
   );

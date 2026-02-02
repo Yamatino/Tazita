@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3, Trophy } from 'lucide-react';
 import { CoffeeType, COFFEE_TYPES, getCoffeeTypeInfo } from '@/types/coffee';
+import { useTheme } from '@/context/ThemeContext';
 
 interface StatsProps {
   entriesByType: Record<CoffeeType, number>;
@@ -11,6 +12,8 @@ interface StatsProps {
 }
 
 export function Stats({ entriesByType, totalEntries }: StatsProps) {
+  const { themeConfig } = useTheme();
+  
   const sortedTypes = useMemo(() => {
     return COFFEE_TYPES.map(type => ({
       ...type,
@@ -26,11 +29,14 @@ export function Stats({ entriesByType, totalEntries }: StatsProps) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="bg-white rounded-2xl p-6 shadow-lg text-center"
+        className="rounded-2xl p-6 shadow-lg text-center"
+        style={{ backgroundColor: '#FFFFFF' }}
       >
         <div className="text-4xl mb-3">📊</div>
-        <p className="text-[#8B6F47]">Todavía no hay estadísticas</p>
-        <p className="text-sm text-[#D4A574] mt-1">¡Empezá a registrar tus cafés! ☕</p>
+        <p style={{ color: themeConfig.accent }}>Todavía no hay estadísticas</p>
+        <p className="text-sm mt-1" style={{ color: themeConfig.accent, opacity: 0.7 }}>
+          ¡Empezá a registrar tus cafés! ☕
+        </p>
       </motion.div>
     );
   }
@@ -39,11 +45,12 @@ export function Stats({ entriesByType, totalEntries }: StatsProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl p-4 shadow-lg"
+      className="rounded-2xl p-4 shadow-lg"
+      style={{ backgroundColor: '#FFFFFF' }}
     >
       <div className="flex items-center gap-2 mb-4">
-        <BarChart3 className="h-5 w-5 text-[#D4A574]" />
-        <h3 className="font-bold text-[#5C4A3A]">Tus Preferencias</h3>
+        <BarChart3 className="h-5 w-5" style={{ color: themeConfig.accent }} />
+        <h3 className="font-bold" style={{ color: themeConfig.text }}>Tus Preferencias</h3>
       </div>
 
       {/* Favorite */}
@@ -51,7 +58,10 @@ export function Stats({ entriesByType, totalEntries }: StatsProps) {
         <motion.div
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
-          className="bg-gradient-to-r from-[#FFE4A1] to-[#FFD1DC] rounded-xl p-3 mb-4"
+          className="rounded-xl p-3 mb-4"
+          style={{ 
+            background: `linear-gradient(135deg, ${themeConfig.primary} 0%, ${themeConfig.secondary} 100%)` 
+          }}
         >
           <div className="flex items-center gap-3">
             <motion.div
@@ -62,11 +72,13 @@ export function Stats({ entriesByType, totalEntries }: StatsProps) {
               🏆
             </motion.div>
             <div>
-              <p className="text-xs text-[#5C4A3A] font-medium">Tu favorito</p>
-              <p className="text-lg font-bold text-[#5C4A3A]">
+              <p className="text-xs font-medium" style={{ color: themeConfig.text }}>Tu favorito</p>
+              <p className="text-lg font-bold" style={{ color: themeConfig.text }}>
                 {favorite.emoji} {favorite.name}
               </p>
-              <p className="text-xs text-[#8B6F47]">{favorite.count} {favorite.count === 1 ? 'vez' : 'veces'}</p>
+              <p className="text-xs" style={{ color: themeConfig.text, opacity: 0.8 }}>
+                {favorite.count} {favorite.count === 1 ? 'vez' : 'veces'}
+              </p>
             </div>
           </div>
         </motion.div>
@@ -89,10 +101,17 @@ export function Stats({ entriesByType, totalEntries }: StatsProps) {
               <span className="text-lg w-6">{type.emoji}</span>
               <div className="flex-1">
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-[#5C4A3A] font-medium">{type.name}</span>
-                  <span className="text-[#8B6F47]">{type.count} ({percentage.toFixed(0)}%)</span>
+                  <span className="font-medium" style={{ color: themeConfig.text }}>
+                    {type.name}
+                  </span>
+                  <span style={{ color: themeConfig.accent }}>
+                    {type.count} ({percentage.toFixed(0)}%)
+                  </span>
                 </div>
-                <div className="h-2 bg-[#F5EDE0] rounded-full overflow-hidden">
+                <div 
+                  className="h-2 rounded-full overflow-hidden"
+                  style={{ backgroundColor: themeConfig.muted }}
+                >
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${(type.count / maxCount) * 100}%` }}

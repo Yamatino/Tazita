@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CoffeeEntry, getCoffeeTypeInfo } from '@/types/coffee';
+import { useTheme } from '@/context/ThemeContext';
 
 interface CalendarProps {
   entries: CoffeeEntry[];
@@ -19,18 +20,11 @@ const MONTHS = [
 
 const WEEKDAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
-// Color coding based on coffee count
-const getDayColor = (count: number): string => {
-  if (count === 0) return '';
-  if (count === 1) return '#FFF8E7'; // cream
-  if (count === 2) return '#FFE4A1'; // light yellow
-  return '#FFD1DC'; // soft pink (3+ coffees)
-};
-
 export function Calendar({ entries, onDayClick, onDayLongPress }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [direction, setDirection] = useState(0);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const { themeConfig } = useTheme();
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -134,24 +128,37 @@ export function Calendar({ entries, onDayClick, onDayLongPress }: CalendarProps)
     })
   };
 
+  // Color coding based on coffee count - uses theme colors
+  const getDayColor = (count: number): string => {
+    if (count === 0) return '';
+    if (count === 1) return themeConfig.background;
+    if (count === 2) return themeConfig.primary;
+    return themeConfig.secondary;
+  };
+
   return (
-    <div className="bg-white rounded-3xl p-4 shadow-lg">
+    <div 
+      className="rounded-3xl p-4 shadow-lg"
+      style={{ backgroundColor: '#FFFFFF' }}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => navigateMonth(-1)}
-          className="rounded-full hover:bg-[#FFE4A1]/30"
+          className="rounded-full transition-all duration-300"
+          style={{ backgroundColor: `${themeConfig.primary}4D` }} // 30% opacity
         >
-          <ChevronLeft className="h-5 w-5 text-[#5C4A3A]" />
+          <ChevronLeft className="h-5 w-5" style={{ color: themeConfig.text }} />
         </Button>
         
         <motion.h3 
           key={`${year}-${month}`}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-lg font-bold text-[#5C4A3A]"
+          className="text-lg font-bold"
+          style={{ color: themeConfig.text }}
         >
           {MONTHS[month]} {year}
         </motion.h3>
@@ -160,9 +167,10 @@ export function Calendar({ entries, onDayClick, onDayLongPress }: CalendarProps)
           variant="ghost"
           size="icon"
           onClick={() => navigateMonth(1)}
-          className="rounded-full hover:bg-[#FFE4A1]/30"
+          className="rounded-full transition-all duration-300"
+          style={{ backgroundColor: `${themeConfig.primary}4D` }}
         >
-          <ChevronRight className="h-5 w-5 text-[#5C4A3A]" />
+          <ChevronRight className="h-5 w-5" style={{ color: themeConfig.text }} />
         </Button>
       </div>
 
@@ -171,7 +179,8 @@ export function Calendar({ entries, onDayClick, onDayLongPress }: CalendarProps)
         {WEEKDAYS.map((day) => (
           <div 
             key={day} 
-            className="text-center text-xs font-medium text-[#8B6F47] py-1"
+            className="text-center text-xs font-medium py-1"
+            style={{ color: themeConfig.accent }}
           >
             {day}
           </div>
@@ -220,18 +229,19 @@ export function Calendar({ entries, onDayClick, onDayLongPress }: CalendarProps)
                 className={`
                   aspect-square rounded-xl flex flex-col items-center justify-center
                   relative cursor-pointer transition-all duration-200 select-none
-                  ${today ? 'ring-2 ring-[#5C4A3A] shadow-md' : ''}
+                  ${today ? 'shadow-md' : ''}
                 `}
                 data-today={today ? 'true' : 'false'}
                 style={{
-                  backgroundColor: dayColor || '#F5EDE0',
-                  border: hasEntries ? '1px solid #E8DCC8' : 'none'
+                  backgroundColor: dayColor || themeConfig.muted,
+                  border: hasEntries ? `1px solid ${themeConfig.border}` : 'none',
+                  boxShadow: today ? `0 0 0 2px ${themeConfig.text}` : undefined
                 }}
               >
-                <span className={`
-                  text-sm font-medium
-                  ${today ? 'text-[#5C4A3A]' : 'text-[#5C4A3A]'}
-                `}>
+                <span 
+                  className="text-sm font-medium"
+                  style={{ color: themeConfig.text }}
+                >
                   {day}
                 </span>
                 
@@ -257,7 +267,12 @@ export function Calendar({ entries, onDayClick, onDayLongPress }: CalendarProps)
                       );
                     })}
                     {dayEntries.length > 3 && (
-                      <span className="text-[8px] text-[#8B6F47]">+{dayEntries.length - 3}</span>
+                      <span 
+                        className="text-[8px]"
+                        style={{ color: themeConfig.accent }}
+                      >
+                        +{dayEntries.length - 3}
+                      </span>
                     )}
                   </motion.div>
                 )}
@@ -268,22 +283,39 @@ export function Calendar({ entries, onDayClick, onDayLongPress }: CalendarProps)
       </AnimatePresence>
 
       {/* Legend */}
-      <div className="mt-4 pt-4 border-t border-[#E8DCC8]">
-        <div className="flex items-center justify-center gap-3 text-xs text-[#8B6F47] flex-wrap">
+      <div 
+        className="mt-4 pt-4 border-t"
+        style={{ borderColor: themeConfig.border }}
+      >
+        <div className="flex items-center justify-center gap-3 text-xs flex-wrap"
+          style={{ color: themeConfig.accent }}
+        >
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFF8E7' }} />
+            <div 
+              className="w-3 h-3 rounded" 
+              style={{ backgroundColor: themeConfig.background }} 
+            />
             <span>1 café</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFE4A1' }} />
+            <div 
+              className="w-3 h-3 rounded" 
+              style={{ backgroundColor: themeConfig.primary }} 
+            />
             <span>2 cafés</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFD1DC' }} />
+            <div 
+              className="w-3 h-3 rounded" 
+              style={{ backgroundColor: themeConfig.secondary }} 
+            />
             <span>3+ cafés</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded ring-2 ring-[#5C4A3A]" />
+            <div 
+              className="w-3 h-3 rounded"
+              style={{ boxShadow: `0 0 0 2px ${themeConfig.text}` }}
+            />
             <span>Hoy</span>
           </div>
         </div>
