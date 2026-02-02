@@ -215,79 +215,51 @@ export function HabitosTab({ entries }: HabitosTabProps) {
           <h3 className="font-bold" style={{ color: themeConfig.text }}>Evolución Mensual</h3>
         </div>
 
-        <div className="relative h-40">
-          {/* Grid lines */}
-          <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-            {[0, 1, 2, 3].map(i => (
-              <div key={i} className="border-t" style={{ borderColor: themeConfig.border }} />
-            ))}
-          </div>
-
-          {/* Line chart */}
-          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor={themeConfig.primary} stopOpacity="0.3" />
-                <stop offset="100%" stopColor={themeConfig.primary} stopOpacity="0" />
-              </linearGradient>
-            </defs>
+        <div className="h-40 flex items-end justify-between gap-2">
+          {monthlyEvolution.months.map((month, i) => {
+            const count = monthlyEvolution.counts[i];
+            const height = maxMonthly > 0 ? (count / maxMonthly) * 100 : 0;
+            const hasData = count > 0;
             
-            {monthlyEvolution.counts.length > 0 && (
-              <>
-                {/* Area fill */}
-                <polygon
-                  fill="url(#lineGradient)"
-                  points={`
-                    0,100
-                    ${monthlyEvolution.counts.map((count, i) => {
-                      const x = (i / (monthlyEvolution.counts.length - 1)) * 100;
-                      const y = 100 - ((count / maxMonthly) * 80 + 10);
-                      return `${x},${y}`;
-                    }).join(' ')}
-                    100,100
-                  `}
-                />
-                
-                {/* Line */}
-                <polyline
-                  fill="none"
-                  stroke={themeConfig.primary}
-                  strokeWidth="2"
-                  points={monthlyEvolution.counts.map((count, i) => {
-                    const x = (i / (monthlyEvolution.counts.length - 1)) * 100;
-                    const y = 100 - ((count / maxMonthly) * 80 + 10);
-                    return `${x},${y}`;
-                  }).join(' ')}
-                />
-                
-                {/* Points */}
-                {monthlyEvolution.counts.map((count, i) => {
-                  const x = (i / (monthlyEvolution.counts.length - 1)) * 100;
-                  const y = 100 - ((count / maxMonthly) * 80 + 10);
-                  return (
-                    <circle
-                      key={i}
-                      cx={x}
-                      cy={y}
-                      r="3"
-                      fill={themeConfig.primary}
-                      stroke="#FFFFFF"
-                      strokeWidth="1"
-                    />
-                  );
-                })}
-              </>
-            )}
-          </svg>
-
-          {/* Month labels */}
-          <div className="flex justify-between mt-2">
-            {monthlyEvolution.months.map((month, i) => (
-              <span key={i} className="text-xs" style={{ color: themeConfig.accent }}>
-                {month}
-              </span>
-            ))}
-          </div>
+            return (
+              <div key={month} className="flex-1 flex flex-col items-center gap-2">
+                <div className="w-full flex-1 flex items-end relative">
+                  {/* Background bar */}
+                  <div 
+                    className="w-full rounded-t-lg absolute bottom-0"
+                    style={{ 
+                      height: '100%',
+                      backgroundColor: themeConfig.muted,
+                      opacity: 0.3
+                    }}
+                  />
+                  {/* Data bar */}
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: `${Math.max(height, hasData ? 5 : 0)}%` }}
+                    transition={{ duration: 0.5, delay: i * 0.05 }}
+                    className="w-full rounded-t-lg relative z-10"
+                    style={{ 
+                      backgroundColor: hasData ? themeConfig.primary : 'transparent',
+                      minHeight: hasData ? '4px' : '0'
+                    }}
+                  >
+                    {hasData && (
+                      <div 
+                        className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold whitespace-nowrap"
+                        style={{ color: themeConfig.text }}
+                      >
+                        {count}
+                      </div>
+                    )}
+                  </motion.div>
+                </div>
+                <span className="text-xs font-medium" style={{ color: themeConfig.accent }}>
+                  {month}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </motion.div>
 

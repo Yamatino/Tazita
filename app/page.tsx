@@ -234,13 +234,6 @@ function AppContent() {
                 className="rounded-2xl p-4 shadow-lg"
                 style={{ backgroundColor: '#FFFFFF' }}
               >
-                <ThemeSelector />
-              </div>
-              
-              <div 
-                className="rounded-2xl p-4 shadow-lg"
-                style={{ backgroundColor: '#FFFFFF' }}
-              >
                 <h3 className="font-bold mb-3" style={{ color: themeConfig.text }}>Acerca de</h3>
                 <p className="text-sm" style={{ color: themeConfig.accent }}>
                   Tazita v1.0 - Hecho con ☕ y {themeConfig.emoji}
