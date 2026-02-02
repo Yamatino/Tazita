@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { CoffeeData, CoffeeEntry, CoffeeType, generateId } from '@/types/coffee';
-import { checkUsernameExists, getUserData, saveUserData } from '@/lib/redis';
+import { checkUsernameExists, getUserData, saveUserData } from '@/lib/supabase';
 
 const USERNAME_KEY = 'tazita-username';
 
@@ -29,11 +29,11 @@ export function useCoffeeData() {
     }
   }, [username]);
 
-  // Auto-save to Redis when data changes
+  // Auto-save to Supabase when data changes
   useEffect(() => {
     if (data && username && isLoaded) {
       const timeoutId = setTimeout(() => {
-        syncToRedis();
+        syncToSupabase();
       }, 1000); // Debounce 1 second
 
       return () => clearTimeout(timeoutId);
@@ -44,7 +44,7 @@ export function useCoffeeData() {
     try {
       const userData = await getUserData(user);
       if (userData) {
-        setData(JSON.parse(userData));
+        setData(userData);
       } else {
         // Initialize new user
         const newData: CoffeeData = {
@@ -67,7 +67,7 @@ export function useCoffeeData() {
     }
   };
 
-  const syncToRedis = async () => {
+  const syncToSupabase = async () => {
     if (!data || !username) return;
     
     setIsSyncing(true);
@@ -77,7 +77,7 @@ export function useCoffeeData() {
       // Also save to localStorage as backup
       localStorage.setItem(`tazita-data-${username}`, JSON.stringify(data));
     } catch (error) {
-      console.error('Error syncing to Redis:', error);
+      console.error('Error syncing to Supabase:', error);
       // Save to localStorage as fallback
       localStorage.setItem(`tazita-data-${username}`, JSON.stringify(data));
     } finally {
@@ -103,7 +103,7 @@ export function useCoffeeData() {
       const existingData = await getUserData(normalizedUsername);
       return { 
         exists: true, 
-        data: existingData ? JSON.parse(existingData) : undefined 
+        data: existingData || undefined
       };
     }
     
@@ -238,6 +238,6 @@ export function useCoffeeData() {
     getEntriesByType,
     getEntriesForDate,
     getEntriesForMonth,
-    syncToRedis
+    syncToSupabase
   };
 }
