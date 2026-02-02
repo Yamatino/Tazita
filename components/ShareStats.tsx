@@ -151,7 +151,7 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-black/70 z-50"
               onClick={() => setIsOpen(false)}
             />
             
@@ -181,7 +181,7 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
                     data-share-card
                     className="relative w-[280px] h-[500px] rounded-3xl overflow-hidden shadow-xl"
                     style={{
-                      background: 'linear-gradient(135deg, #FFE4A1 0%, #FFD1DC 50%, #FFF8E7 100%)'
+                      background: '#FFE4A1'
                     }}
                   >
                     {/* Background Pattern */}
@@ -210,22 +210,22 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
 
                       {/* Stats Grid */}
                       <div className="flex-1 grid grid-cols-2 gap-3">
-                        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
+                        <div className="bg-white/95 rounded-2xl p-4 flex flex-col items-center justify-center shadow-md border border-[#FFE4A1]/50">
                           <p className="text-4xl font-bold text-[#5C4A3A]">{today}</p>
                           <p className="text-xs text-[#8B6F47] font-medium mt-1">Today</p>
                         </div>
                         
-                        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
+                        <div className="bg-white/95 rounded-2xl p-4 flex flex-col items-center justify-center shadow-md border border-[#FFE4A1]/50">
                           <p className="text-4xl font-bold text-[#5C4A3A]">{month}</p>
                           <p className="text-xs text-[#8B6F47] font-medium mt-1">This Month</p>
                         </div>
                         
-                        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
+                        <div className="bg-white/95 rounded-2xl p-4 flex flex-col items-center justify-center shadow-md border border-[#FFE4A1]/50">
                           <p className="text-4xl font-bold text-[#5C4A3A]">{year}</p>
                           <p className="text-xs text-[#8B6F47] font-medium mt-1">This Year</p>
                         </div>
                         
-                        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
+                        <div className="bg-white/95 rounded-2xl p-4 flex flex-col items-center justify-center shadow-md border border-[#FFE4A1]/50">
                           <p className="text-4xl font-bold text-[#5C4A3A]">{streak}</p>
                           <p className="text-xs text-[#8B6F47] font-medium mt-1">Day Streak 🔥</p>
                         </div>
@@ -233,7 +233,7 @@ export function ShareStats({ today, month, year, streak, entriesByType, totalEnt
 
                       {/* Favorites */}
                       {sortedTypes.length > 0 && (
-                        <div className="mt-4 bg-white/80 backdrop-blur-sm rounded-2xl p-4">
+                        <div className="mt-4 bg-white/90 rounded-2xl p-4 shadow-md border border-[#FFE4A1]/50">
                           <p className="text-xs text-[#8B6F47] mb-2 text-center font-medium">My Favorites</p>
                           <div className="flex justify-center gap-4">
                             {sortedTypes.map(([type, count]) => {

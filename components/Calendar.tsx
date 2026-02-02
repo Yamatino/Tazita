@@ -8,18 +8,29 @@ import { CoffeeEntry, getCoffeeTypeInfo } from '@/types/coffee';
 
 interface CalendarProps {
   entries: CoffeeEntry[];
+  onDayClick?: (date: Date) => void;
+  onDayLongPress?: (date: Date) => void;
 }
 
 const MONTHS = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-const WEEKDAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export function Calendar({ entries }: CalendarProps) {
+// Color coding based on coffee count
+const getDayColor = (count: number): string => {
+  if (count === 0) return '';
+  if (count === 1) return '#FFF8E7'; // cream
+  if (count === 2) return '#FFE4A1'; // light yellow
+  return '#FFD1DC'; // soft pink (3+ coffees)
+};
+
+export function Calendar({ entries, onDayClick, onDayLongPress }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [direction, setDirection] = useState(0);
+  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -61,6 +72,51 @@ export function Calendar({ entries }: CalendarProps) {
   const getDayEntries = (day: number) => {
     const date = new Date(year, month, day).toDateString();
     return entriesByDate.get(date) || [];
+  };
+
+  const handleDayClick = (day: number) => {
+    if (onDayClick) {
+      onDayClick(new Date(year, month, day));
+    }
+  };
+
+  const handleDayMouseDown = (day: number) => {
+    if (onDayLongPress) {
+      const timer = setTimeout(() => {
+        onDayLongPress(new Date(year, month, day));
+      }, 500);
+      setLongPressTimer(timer);
+    }
+  };
+
+  const handleDayMouseUp = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+  };
+
+  const handleDayTouchStart = (day: number) => {
+    if (onDayLongPress) {
+      const timer = setTimeout(() => {
+        onDayLongPress(new Date(year, month, day));
+      }, 500);
+      setLongPressTimer(timer);
+    }
+  };
+
+  const handleDayTouchEnd = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+  };
+
+  const handleContextMenu = (e: React.MouseEvent, day: number) => {
+    e.preventDefault();
+    if (onDayLongPress) {
+      onDayLongPress(new Date(year, month, day));
+    }
   };
 
   const slideVariants = {
@@ -145,6 +201,7 @@ export function Calendar({ entries }: CalendarProps) {
             const dayEntries = getDayEntries(day);
             const hasEntries = dayEntries.length > 0;
             const today = isToday(day);
+            const dayColor = getDayColor(dayEntries.length);
 
             return (
               <motion.div
@@ -153,12 +210,22 @@ export function Calendar({ entries }: CalendarProps) {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: index * 0.01 }}
                 whileHover={{ scale: 1.05 }}
+                onClick={() => handleDayClick(day)}
+                onMouseDown={() => handleDayMouseDown(day)}
+                onMouseUp={handleDayMouseUp}
+                onMouseLeave={handleDayMouseUp}
+                onTouchStart={() => handleDayTouchStart(day)}
+                onTouchEnd={handleDayTouchEnd}
+                onContextMenu={(e) => handleContextMenu(e, day)}
                 className={`
                   aspect-square rounded-xl flex flex-col items-center justify-center
-                  relative cursor-pointer transition-all duration-200
-                  ${today ? 'bg-[#FFE4A1] shadow-md' : 'hover:bg-[#F5EDE0]'}
-                  ${hasEntries && !today ? 'bg-[#FFF8E7] border border-[#FFE4A1]' : ''}
+                  relative cursor-pointer transition-all duration-200 select-none
+                  ${today ? 'ring-2 ring-[#5C4A3A] shadow-md' : ''}
                 `}
+                style={{
+                  backgroundColor: today ? '#FFE4A1' : (dayColor || '#F5EDE0'),
+                  border: hasEntries && !today ? '1px solid #E8DCC8' : 'none'
+                }}
               >
                 <span className={`
                   text-sm font-medium
@@ -198,6 +265,24 @@ export function Calendar({ entries }: CalendarProps) {
           })}
         </motion.div>
       </AnimatePresence>
+
+      {/* Legend */}
+      <div className="mt-4 pt-4 border-t border-[#E8DCC8]">
+        <div className="flex items-center justify-center gap-4 text-xs text-[#8B6F47]">
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFF8E7' }} />
+            <span>1 coffee</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFE4A1' }} />
+            <span>2 coffees</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#FFD1DC' }} />
+            <span>3+ coffees</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

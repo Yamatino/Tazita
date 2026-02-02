@@ -118,11 +118,12 @@ export function useCoffeeData() {
     setUsername(normalizedUsername);
   };
 
-  const addCoffee = useCallback((type: CoffeeType, notes?: string) => {
+  const addCoffee = useCallback((type: CoffeeType, date: string, notes?: string) => {
     const newEntry: CoffeeEntry = {
       id: generateId(),
       type,
       timestamp: new Date().toISOString(),
+      date,
       notes
     };
 

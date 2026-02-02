@@ -11,12 +11,15 @@ import { CoffeeType, COFFEE_TYPES } from '@/types/coffee';
 interface CoffeeTypeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (type: CoffeeType, notes?: string) => void;
+  onSelect: (type: CoffeeType, date: string, notes?: string) => void;
 }
 
 export function CoffeeTypeModal({ isOpen, onClose, onSelect }: CoffeeTypeModalProps) {
   const [selectedType, setSelectedType] = useState<CoffeeType | null>(null);
   const [notes, setNotes] = useState('');
+  const [selectedDate, setSelectedDate] = useState(() => {
+    return new Date().toISOString().split('T')[0];
+  });
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSelect = (type: CoffeeType) => {
@@ -25,13 +28,14 @@ export function CoffeeTypeModal({ isOpen, onClose, onSelect }: CoffeeTypeModalPr
 
   const handleConfirm = () => {
     if (selectedType) {
-      onSelect(selectedType, notes.trim() || undefined);
+      onSelect(selectedType, selectedDate, notes.trim() || undefined);
       setShowSuccess(true);
       
       setTimeout(() => {
         setShowSuccess(false);
         setSelectedType(null);
         setNotes('');
+        setSelectedDate(new Date().toISOString().split('T')[0]);
         onClose();
       }, 1200);
     }
@@ -40,8 +44,11 @@ export function CoffeeTypeModal({ isOpen, onClose, onSelect }: CoffeeTypeModalPr
   const handleClose = () => {
     setSelectedType(null);
     setNotes('');
+    setSelectedDate(new Date().toISOString().split('T')[0]);
     onClose();
   };
+
+  const today = new Date().toISOString().split('T')[0];
 
   return (
     <AnimatePresence>
@@ -73,7 +80,7 @@ export function CoffeeTypeModal({ isOpen, onClose, onSelect }: CoffeeTypeModalPr
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.1 }}
                 >
-                  ¿Qué café tomaste? ☕
+                  What coffee did you have? ☕
                 </motion.h2>
                 <Button
                   variant="ghost"
@@ -103,11 +110,31 @@ export function CoffeeTypeModal({ isOpen, onClose, onSelect }: CoffeeTypeModalPr
                       className="text-center"
                     >
                       <div className="text-6xl mb-4">☕✨</div>
-                      <p className="text-xl font-bold text-[#5C4A3A]">¡Registrado! 🎉</p>
+                      <p className="text-xl font-bold text-[#5C4A3A]">Added! 🎉</p>
                     </motion.div>
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* Date Picker */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+                className="mb-6"
+              >
+                <Label htmlFor="coffee-date" className="text-[#5C4A3A] font-medium mb-2 block">
+                  Date 📅
+                </Label>
+                <Input
+                  id="coffee-date"
+                  type="date"
+                  value={selectedDate}
+                  max={today}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="border-[#E8DCC8] focus:border-[#FFE4A1] focus:ring-[#FFE4A1] rounded-xl"
+                />
+              </motion.div>
 
               {/* Coffee Types Grid */}
               <div className="grid grid-cols-2 gap-3 mb-6">
@@ -116,7 +143,7 @@ export function CoffeeTypeModal({ isOpen, onClose, onSelect }: CoffeeTypeModalPr
                     key={coffee.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    transition={{ delay: index * 0.05 + 0.1 }}
                     whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleSelect(coffee.id)}
@@ -152,11 +179,11 @@ export function CoffeeTypeModal({ isOpen, onClose, onSelect }: CoffeeTypeModalPr
                     className="mb-4"
                   >
                     <Label htmlFor="notes" className="text-[#5C4A3A] font-medium mb-2 block">
-                      ¿Algo especial? (opcional) 📝
+                      Anything special? (optional) 📝
                     </Label>
                     <Input
                       id="notes"
-                      placeholder="Ej: Estaba delicioso, con leche, etc."
+                      placeholder="E.g., Delicious, with milk, etc."
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       className="border-[#E8DCC8] focus:border-[#FFE4A1] focus:ring-[#FFE4A1] rounded-xl"
@@ -182,7 +209,7 @@ export function CoffeeTypeModal({ isOpen, onClose, onSelect }: CoffeeTypeModalPr
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        ¡Agregar café! ☕✨
+                        Add coffee! ☕✨
                       </motion.span>
                     </Button>
                   </motion.div>

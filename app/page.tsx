@@ -14,10 +14,13 @@ import { Streak } from '@/components/Streak';
 import { Stats } from '@/components/Stats';
 import { UsernameManager } from '@/components/UsernameManager';
 import { ShareStats } from '@/components/ShareStats';
+import { DayDetailsModal } from '@/components/DayDetailsModal';
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isDayDetailsOpen, setIsDayDetailsOpen] = useState(false);
   
   const {
     data,
@@ -27,9 +30,11 @@ export default function Home() {
     setUser,
     switchUser,
     addCoffee,
+    removeCoffee,
     getStats,
     getStreak,
-    getEntriesByType
+    getEntriesByType,
+    getEntriesForDate
   } = useCoffeeData();
 
   const stats = getStats();
@@ -37,9 +42,26 @@ export default function Home() {
   const entriesByType = getEntriesByType();
   const totalEntries = data?.entries.length || 0;
 
-  const handleAddCoffee = (type: CoffeeType, notes?: string) => {
-    addCoffee(type, notes);
+  const handleAddCoffee = (type: CoffeeType, date: string, notes?: string) => {
+    addCoffee(type, date, notes);
   };
+
+  const handleDayClick = (date: Date) => {
+    setSelectedDate(date);
+    setIsDayDetailsOpen(true);
+  };
+
+  const handleDayLongPress = (date: Date) => {
+    // Open day details on long press as well
+    setSelectedDate(date);
+    setIsDayDetailsOpen(true);
+  };
+
+  const handleDeleteEntry = (id: string) => {
+    removeCoffee(id);
+  };
+
+  const selectedDateEntries = selectedDate ? getEntriesForDate(selectedDate) : [];
 
   if (!isLoaded) {
     return (
@@ -182,7 +204,11 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Calendar entries={data?.entries || []} />
+              <Calendar 
+                entries={data?.entries || []}
+                onDayClick={handleDayClick}
+                onDayLongPress={handleDayLongPress}
+              />
             </motion.div>
 
             {/* Stats */}
@@ -228,6 +254,15 @@ export default function Home() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelect={handleAddCoffee}
+      />
+
+      {/* Day Details Modal */}
+      <DayDetailsModal
+        isOpen={isDayDetailsOpen}
+        onClose={() => setIsDayDetailsOpen(false)}
+        date={selectedDate}
+        entries={selectedDateEntries}
+        onDeleteEntry={handleDeleteEntry}
       />
     </main>
   );

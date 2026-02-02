@@ -4,13 +4,15 @@ export type CoffeeType =
   | 'expresso' 
   | 'especialidad' 
   | 'cafe_frio' 
-  | 'starbucks';
+  | 'starbucks'
+  | 'filtrado';
 
 export interface CoffeeEntry {
   id: string;
   type: CoffeeType;
   timestamp: string;
   notes?: string;
+  date: string; // YYYY-MM-DD format for the coffee date
 }
 
 export interface CoffeeData {
@@ -69,6 +71,13 @@ export const COFFEE_TYPES: CoffeeTypeInfo[] = [
     emoji: '🥤',
     color: '#00704A',
     description: 'Cualquier bebida de Starbucks'
+  },
+  {
+    id: 'filtrado',
+    name: 'Café Filtrado',
+    emoji: '🫗',
+    color: '#C4A77D',
+    description: 'V60, Chemex, Kalita, etc.'
   }
 ];
 
@@ -76,15 +85,10 @@ export function getCoffeeTypeInfo(type: CoffeeType): CoffeeTypeInfo {
   return COFFEE_TYPES.find(ct => ct.id === type) || COFFEE_TYPES[0];
 }
 
-export function generateRecoveryCode(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
-
 export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+export function formatDate(date: Date): string {
+  return date.toISOString().split('T')[0];
 }
