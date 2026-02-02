@@ -9,14 +9,34 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Tazita - Rastreador de Café ☕",
-  description: "Llevá el control de tus cafés de forma simple y divertida. Temática Pompompurin 🍮",
-  keywords: ["café", "tracker", "pompompurin", "rastreador", "coffee"],
+  title: "Tazita - Coffee Tracker ☕",
+  description: "Track your coffee in a simple and fun way. Pompompurin theme 🍮",
+  keywords: ["coffee", "tracker", "pompompurin", "tazita"],
   authors: [{ name: "Tazita" }],
   openGraph: {
-    title: "Tazita - Rastreador de Café",
-    description: "Llevá el control de tus cafés de forma simple y divertida 🍮",
+    title: "Tazita - Coffee Tracker",
+    description: "Track your coffee in a simple and fun way 🍮",
     type: "website",
+  },
+  icons: {
+    icon: [
+      {
+        url: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>",
+        type: "image/svg+xml",
+      }
+    ],
+    shortcut: [
+      {
+        url: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>",
+        type: "image/svg+xml",
+      }
+    ],
+    apple: [
+      {
+        url: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>",
+        type: "image/svg+xml",
+      }
+    ],
   },
 };
 
@@ -33,7 +53,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="en">
+      <head>
+        <link 
+          rel="icon" 
+          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>" 
+        />
+      </head>
       <body
         className={`${nunito.variable} font-sans antialiased coffee-pattern min-h-screen`}
       >

@@ -1,45 +1,121 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { CoffeeData, CoffeeEntry, CoffeeType, generateRecoveryCode, generateId } from '@/types/coffee';
+import { CoffeeData, CoffeeEntry, CoffeeType, generateId } from '@/types/coffee';
+import { checkUsernameExists, getUserData, saveUserData } from '@/lib/redis';
 
-const STORAGE_KEY = 'tazita-coffee-data';
+const USERNAME_KEY = 'tazita-username';
 
 export function useCoffeeData() {
   const [data, setData] = useState<CoffeeData | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSync, setLastSync] = useState<Date | null>(null);
 
-  // Load data from localStorage on mount
+  // Load username from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setData(parsed);
-      } catch (e) {
-        console.error('Error parsing coffee data:', e);
-        initializeData();
-      }
-    } else {
-      initializeData();
+    const storedUsername = localStorage.getItem(USERNAME_KEY);
+    if (storedUsername) {
+      setUsername(storedUsername);
     }
     setIsLoaded(true);
   }, []);
 
-  // Save to localStorage whenever data changes
+  // Load data when username changes
   useEffect(() => {
-    if (data && isLoaded) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    if (username) {
+      loadUserData(username);
     }
-  }, [data, isLoaded]);
+  }, [username]);
 
-  const initializeData = () => {
+  // Auto-save to Redis when data changes
+  useEffect(() => {
+    if (data && username && isLoaded) {
+      const timeoutId = setTimeout(() => {
+        syncToRedis();
+      }, 1000); // Debounce 1 second
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [data, username, isLoaded]);
+
+  const loadUserData = async (user: string) => {
+    try {
+      const userData = await getUserData(user);
+      if (userData) {
+        setData(JSON.parse(userData));
+      } else {
+        // Initialize new user
+        const newData: CoffeeData = {
+          entries: [],
+          username: user,
+          createdAt: new Date().toISOString()
+        };
+        setData(newData);
+        await saveUserData(user, newData);
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      // Fallback to localStorage
+      const localData = localStorage.getItem(`tazita-data-${user}`);
+      if (localData) {
+        setData(JSON.parse(localData));
+      } else {
+        initializeData(user);
+      }
+    }
+  };
+
+  const syncToRedis = async () => {
+    if (!data || !username) return;
+    
+    setIsSyncing(true);
+    try {
+      await saveUserData(username, data);
+      setLastSync(new Date());
+      // Also save to localStorage as backup
+      localStorage.setItem(`tazita-data-${username}`, JSON.stringify(data));
+    } catch (error) {
+      console.error('Error syncing to Redis:', error);
+      // Save to localStorage as fallback
+      localStorage.setItem(`tazita-data-${username}`, JSON.stringify(data));
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const initializeData = (user?: string) => {
     const newData: CoffeeData = {
       entries: [],
-      recoveryCode: generateRecoveryCode(),
+      username: user || username || '',
       createdAt: new Date().toISOString()
     };
     setData(newData);
+    return newData;
+  };
+
+  const setUser = async (newUsername: string): Promise<{ exists: boolean; data?: CoffeeData }> => {
+    const normalizedUsername = newUsername.toLowerCase().trim();
+    const exists = await checkUsernameExists(normalizedUsername);
+    
+    if (exists) {
+      const existingData = await getUserData(normalizedUsername);
+      return { 
+        exists: true, 
+        data: existingData ? JSON.parse(existingData) : undefined 
+      };
+    }
+    
+    localStorage.setItem(USERNAME_KEY, normalizedUsername);
+    setUsername(normalizedUsername);
+    return { exists: false };
+  };
+
+  const switchUser = (newUsername: string) => {
+    const normalizedUsername = newUsername.toLowerCase().trim();
+    localStorage.setItem(USERNAME_KEY, normalizedUsername);
+    setUsername(normalizedUsername);
   };
 
   const addCoffee = useCallback((type: CoffeeType, notes?: string) => {
@@ -68,14 +144,6 @@ export function useCoffeeData() {
         ...prev,
         entries: prev.entries.filter(e => e.id !== id)
       };
-    });
-  }, []);
-
-  const loadFromCode = useCallback((code: string, entries: CoffeeEntry[]) => {
-    setData({
-      entries,
-      recoveryCode: code,
-      createdAt: new Date().toISOString()
     });
   }, []);
 
@@ -158,13 +226,18 @@ export function useCoffeeData() {
   return {
     data,
     isLoaded,
+    username,
+    isSyncing,
+    lastSync,
+    setUser,
+    switchUser,
     addCoffee,
     removeCoffee,
-    loadFromCode,
     getStats,
     getStreak,
     getEntriesByType,
     getEntriesForDate,
-    getEntriesForMonth
+    getEntriesForMonth,
+    syncToRedis
   };
 }

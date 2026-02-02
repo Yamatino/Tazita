@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Coffee, Settings, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Settings, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCoffeeData } from '@/hooks/useCoffeeData';
 import { CoffeeType } from '@/types/coffee';
@@ -12,7 +12,7 @@ import { Calendar } from '@/components/Calendar';
 import { Counter } from '@/components/Counter';
 import { Streak } from '@/components/Streak';
 import { Stats } from '@/components/Stats';
-import { RecoveryCode } from '@/components/RecoveryCode';
+import { UsernameManager } from '@/components/UsernameManager';
 import { ShareStats } from '@/components/ShareStats';
 
 export default function Home() {
@@ -22,8 +22,11 @@ export default function Home() {
   const {
     data,
     isLoaded,
+    username,
+    isSyncing,
+    setUser,
+    switchUser,
     addCoffee,
-    loadFromCode,
     getStats,
     getStreak,
     getEntriesByType
@@ -52,6 +55,37 @@ export default function Home() {
     );
   }
 
+  // Show username setup if no username
+  if (!username) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="bg-white rounded-3xl p-8 shadow-xl max-w-sm w-full"
+        >
+          <div className="text-center mb-6">
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-6xl mb-4"
+            >
+              🍮
+            </motion.div>
+            <h1 className="text-2xl font-bold text-[#5C4A3A] mb-2">Welcome to Tazita</h1>
+            <p className="text-[#8B6F47]">Your personal coffee tracker ☕</p>
+          </div>
+
+          <UsernameManager
+            currentUsername={username}
+            onSetUsername={setUser}
+            onSwitchUser={switchUser}
+          />
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <main className="min-h-screen pb-24">
       {/* Header */}
@@ -71,7 +105,19 @@ export default function Home() {
             </motion.div>
             <div>
               <h1 className="text-xl font-bold text-[#5C4A3A]">Tazita</h1>
-              <p className="text-xs text-[#8B6F47]">Tu rastreador de café ☕</p>
+              <div className="flex items-center gap-1">
+                <User className="h-3 w-3 text-[#8B6F47]" />
+                <p className="text-xs text-[#8B6F47]">{username}</p>
+                {isSyncing && (
+                  <motion.span
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="text-[10px] text-[#D4A574]"
+                  >
+                    syncing...
+                  </motion.span>
+                )}
+              </div>
             </div>
           </div>
           
@@ -100,17 +146,21 @@ export default function Home() {
             className="space-y-4"
           >
             <div className="bg-white rounded-2xl p-4 shadow-lg">
-              <h2 className="text-lg font-bold text-[#5C4A3A] mb-4">Configuración ⚙️</h2>
-              <RecoveryCode data={data} onLoadData={loadFromCode} />
+              <h2 className="text-lg font-bold text-[#5C4A3A] mb-4">Settings ⚙️</h2>
+              <UsernameManager
+                currentUsername={username}
+                onSetUsername={setUser}
+                onSwitchUser={switchUser}
+              />
             </div>
             
             <div className="bg-white rounded-2xl p-4 shadow-lg">
-              <h3 className="font-bold text-[#5C4A3A] mb-3">Acerca de</h3>
+              <h3 className="font-bold text-[#5C4A3A] mb-3">About</h3>
               <p className="text-sm text-[#8B6F47]">
-                Tazita v1.0 - Hecho con ☕ y 🍮 para tu novia
+                Tazita v1.0 - Made with ☕ and 🍮
               </p>
               <p className="text-xs text-[#D4A574] mt-2">
-                Temática Pompompurin 💛
+                Pompompurin Theme 💛
               </p>
             </div>
           </motion.div>
@@ -161,6 +211,7 @@ export default function Home() {
                 streak={streak}
                 entriesByType={entriesByType}
                 totalEntries={totalEntries}
+                username={username}
               />
             </motion.div>
           </>

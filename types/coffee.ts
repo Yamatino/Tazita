@@ -15,7 +15,7 @@ export interface CoffeeEntry {
 
 export interface CoffeeData {
   entries: CoffeeEntry[];
-  recoveryCode: string;
+  username: string;
   createdAt: string;
 }
 
