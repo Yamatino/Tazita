@@ -197,38 +197,38 @@ export function HabitosTab({ entries }: HabitosTabProps) {
           <h3 className="font-bold" style={{ color: themeConfig.text }}>Patrones Semanales</h3>
         </div>
 
-        <div className="flex items-end justify-between gap-2 h-40">
-          {WEEKDAYS.map((day, index) => {
-            const count = weeklyPattern[index];
-            const height = maxWeekly > 0 ? (count / maxWeekly) * 100 : 0;
-            // Ensure minimum visibility for small values
-            const displayHeight = Math.max(height, count > 0 ? 8 : 0);
-            
-            return (
-              <div key={day} className="flex-1 flex flex-col items-center gap-2">
-                <div className="w-full flex-1 flex items-end relative">
+        <div className="h-40">
+          <div className="h-full flex items-end justify-between gap-2">
+            {WEEKDAYS.map((day, index) => {
+              const count = weeklyPattern[index];
+              const height = maxWeekly > 0 ? (count / maxWeekly) * 100 : 0;
+              // Small minimum for visibility but don't override real proportions
+              const displayHeight = count > 0 ? Math.max(height, 2) : 0;
+              
+              return (
+                <div key={day} className="flex-1 h-full flex flex-col items-center justify-end gap-2">
                   <div
-                    className="w-full rounded-t-lg relative group cursor-pointer transition-all duration-500"
+                    className="w-full rounded-t-lg relative group cursor-pointer"
                     style={{ 
                       height: `${displayHeight}%`,
                       backgroundColor: themeConfig.primary,
-                      minHeight: count > 0 ? '4px' : '0'
+                      minHeight: count > 0 ? '2px' : '0'
                     }}
                   >
                     <div 
-                      className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+                      className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10"
                       style={{ backgroundColor: themeConfig.text, color: '#FFFFFF' }}
                     >
                       {count} café{count !== 1 ? 's' : ''}
                     </div>
                   </div>
+                  <span className="text-xs font-medium" style={{ color: themeConfig.accent }}>
+                    {day}
+                  </span>
                 </div>
-                <span className="text-xs font-medium" style={{ color: themeConfig.accent }}>
-                  {day}
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </motion.div>
 
