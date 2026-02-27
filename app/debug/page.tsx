@@ -114,21 +114,28 @@ export default function DebugPage() {
                   </div>
                 </div>
 
-                <div className="h-40 flex items-end justify-between gap-2 bg-gray-100 p-4 rounded">
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => {
-                    const height = Math.max(weekly.heights[i], weekly.counts[i] > 0 ? 4 : 0);
-                    return (
-                      <div key={day} className="flex-1 flex flex-col items-center gap-2">
-                        <div className="w-full flex-1 flex items-end">
-                          <div
-                            className="w-full bg-blue-500 rounded-t transition-all duration-500"
-                            style={{ height: `${height}%`, minHeight: weekly.counts[i] > 0 ? '4px' : '0' }}
+                <div className="h-40 bg-gray-100 p-4 rounded">
+                  <div className="h-full flex items-end justify-between gap-2">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => {
+                      const count = weekly.counts[i];
+                      const height = weekly.heights[i];
+                      // No minimum - let real heights show
+                      const displayHeight = count > 0 ? Math.max(height, 2) : 0;
+                      
+                      return (
+                        <div key={day} className="flex-1 h-full flex flex-col items-center justify-end gap-2">
+                          <div 
+                            className="w-full bg-blue-500 rounded-t"
+                            style={{ 
+                              height: `${displayHeight}%`,
+                              minHeight: count > 0 ? '2px' : '0'
+                            }}
                           />
+                          <span className="text-xs font-medium">{day}</span>
                         </div>
-                        <span className="text-xs font-medium">{day}</span>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="bg-gray-50 p-4 rounded max-h-64 overflow-auto">
