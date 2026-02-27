@@ -32,7 +32,10 @@ export function HabitosTab({ entries }: HabitosTabProps) {
   const weeklyPattern = useMemo(() => {
     const counts = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
     filteredEntries.forEach(entry => {
-      const day = new Date(entry.timestamp).getDay();
+      // Use the date field (YYYY-MM-DD) to avoid timezone issues
+      const [year, month, dayOfMonth] = entry.date.split('-').map(Number);
+      const date = new Date(year, month - 1, dayOfMonth);
+      const day = date.getDay();
       counts[day]++;
     });
     return counts;
