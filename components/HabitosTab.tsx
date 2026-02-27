@@ -207,10 +207,13 @@ export function HabitosTab({ entries }: HabitosTabProps) {
                 <div className="w-full flex-1 flex items-end">
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: `${height}%` }}
+                    animate={{ height: `${Math.max(height, count > 0 ? 4 : 0)}%` }}
                     transition={{ duration: 0.5, delay: index * 0.05 }}
                     className="w-full rounded-t-lg relative group cursor-pointer"
-                    style={{ backgroundColor: themeConfig.primary }}
+                    style={{ 
+                      backgroundColor: themeConfig.primary,
+                      minHeight: count > 0 ? '4px' : '0'
+                    }}
                   >
                     <div 
                       className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
