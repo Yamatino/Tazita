@@ -32,11 +32,35 @@ export function HabitosTab({ entries }: HabitosTabProps) {
   const weeklyPattern = useMemo(() => {
     const counts = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
     filteredEntries.forEach(entry => {
-      // Use the date field (YYYY-MM-DD) to avoid timezone issues
-      const [year, month, dayOfMonth] = entry.date.split('-').map(Number);
-      const date = new Date(year, month - 1, dayOfMonth);
-      const day = date.getDay();
-      counts[day]++;
+      try {
+        let dateStr = entry.date;
+        
+        // Fallback: if date field is missing, extract from timestamp
+        if (!dateStr && entry.timestamp) {
+          const timestamp = new Date(entry.timestamp);
+          const year = timestamp.getFullYear();
+          const month = String(timestamp.getMonth() + 1).padStart(2, '0');
+          const day = String(timestamp.getDate()).padStart(2, '0');
+          dateStr = `${year}-${month}-${day}`;
+        }
+        
+        if (!dateStr || typeof dateStr !== 'string') {
+          console.warn('Invalid date for entry:', entry);
+          return;
+        }
+        
+        const [year, month, dayOfMonth] = dateStr.split('-').map(Number);
+        if (isNaN(year) || isNaN(month) || isNaN(dayOfMonth)) {
+          console.warn('Invalid date format for entry:', entry);
+          return;
+        }
+        
+        const date = new Date(year, month - 1, dayOfMonth);
+        const day = date.getDay();
+        counts[day]++;
+      } catch (error) {
+        console.error('Error processing entry date:', error, entry);
+      }
     });
     return counts;
   }, [filteredEntries]);
