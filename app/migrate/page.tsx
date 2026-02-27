@@ -44,8 +44,23 @@ export default function MigratePage() {
     setMigrating(user.username);
     
     try {
+      console.log('Migrating user:', user.username);
+      console.log('Data:', user.data);
+      
+      // Ensure data is valid
+      if (!user.data || !user.data.entries) {
+        throw new Error('Invalid data structure');
+      }
+      
+      // Create proper CoffeeData object
+      const coffeeData: CoffeeData = {
+        entries: user.data.entries || [],
+        username: user.username,
+        createdAt: user.data.createdAt || new Date().toISOString()
+      };
+      
       // Migrate coffee data
-      await saveUserData(user.username, user.data);
+      await saveUserData(user.username, coffeeData);
       
       // Migrate theme if exists
       if (user.theme) {
@@ -54,9 +69,10 @@ export default function MigratePage() {
       
       setResults(prev => ({
         ...prev,
-        [user.username]: `Success! Migrated ${user.data.entries.length} entries`
+        [user.username]: `Success! Migrated ${coffeeData.entries.length} entries`
       }));
     } catch (error) {
+      console.error('Migration error:', error);
       setResults(prev => ({
         ...prev,
         [user.username]: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
