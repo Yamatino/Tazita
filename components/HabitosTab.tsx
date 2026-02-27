@@ -201,13 +201,15 @@ export function HabitosTab({ entries }: HabitosTabProps) {
           {WEEKDAYS.map((day, index) => {
             const count = weeklyPattern[index];
             const height = maxWeekly > 0 ? (count / maxWeekly) * 100 : 0;
+            const displayHeight = Math.max(height, count > 0 ? 4 : 0);
             
             return (
               <div key={day} className="flex-1 flex flex-col items-center gap-2">
                 <div className="w-full flex-1 flex items-end">
                   <motion.div
+                    key={`${timeRange}-${count}-${maxWeekly}`}
                     initial={{ height: 0 }}
-                    animate={{ height: `${Math.max(height, count > 0 ? 4 : 0)}%` }}
+                    animate={{ height: `${displayHeight}%` }}
                     transition={{ duration: 0.5, delay: index * 0.05 }}
                     className="w-full rounded-t-lg relative group cursor-pointer"
                     style={{ 
