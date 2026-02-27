@@ -201,11 +201,12 @@ export function HabitosTab({ entries }: HabitosTabProps) {
           {WEEKDAYS.map((day, index) => {
             const count = weeklyPattern[index];
             const height = maxWeekly > 0 ? (count / maxWeekly) * 100 : 0;
-            const displayHeight = Math.max(height, count > 0 ? 4 : 0);
+            // Ensure minimum visibility for small values
+            const displayHeight = Math.max(height, count > 0 ? 8 : 0);
             
             return (
               <div key={day} className="flex-1 flex flex-col items-center gap-2">
-                <div className="w-full flex-1 flex items-end">
+                <div className="w-full flex-1 flex items-end relative">
                   <motion.div
                     key={`${timeRange}-${count}-${maxWeekly}`}
                     initial={{ height: 0 }}
@@ -214,7 +215,7 @@ export function HabitosTab({ entries }: HabitosTabProps) {
                     className="w-full rounded-t-lg relative group cursor-pointer"
                     style={{ 
                       backgroundColor: themeConfig.primary,
-                      minHeight: count > 0 ? '4px' : '0'
+                      minHeight: count > 0 ? '8px' : '0'
                     }}
                   >
                     <div 
