@@ -207,15 +207,12 @@ export function HabitosTab({ entries }: HabitosTabProps) {
             return (
               <div key={day} className="flex-1 flex flex-col items-center gap-2">
                 <div className="w-full flex-1 flex items-end relative">
-                  <motion.div
-                    key={`${timeRange}-${count}-${maxWeekly}`}
-                    initial={{ height: 0 }}
-                    animate={{ height: `${displayHeight}%` }}
-                    transition={{ duration: 0.5, delay: index * 0.05 }}
-                    className="w-full rounded-t-lg relative group cursor-pointer"
+                  <div
+                    className="w-full rounded-t-lg relative group cursor-pointer transition-all duration-500"
                     style={{ 
+                      height: `${displayHeight}%`,
                       backgroundColor: themeConfig.primary,
-                      minHeight: count > 0 ? '8px' : '0'
+                      minHeight: count > 0 ? '4px' : '0'
                     }}
                   >
                     <div 
@@ -224,7 +221,7 @@ export function HabitosTab({ entries }: HabitosTabProps) {
                     >
                       {count} café{count !== 1 ? 's' : ''}
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
                 <span className="text-xs font-medium" style={{ color: themeConfig.accent }}>
                   {day}
