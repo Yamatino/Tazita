@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, X, User, BarChart3, Home } from 'lucide-react';
+import { Settings, X, User, BarChart3, Home, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCoffeeData } from '@/hooks/useCoffeeData';
 import { CoffeeType } from '@/types/coffee';
@@ -22,26 +22,26 @@ import { HabitosTab } from '@/components/HabitosTab';
 
 type Tab = 'main' | 'habitos' | 'settings';
 
-function AppContent() {
+type AppContentProps = ReturnType<typeof useCoffeeData>;
+
+function AppContent({
+  data,
+  isLoaded,
+  username,
+  isSyncing,
+  setUser,
+  switchUser,
+  addCoffee,
+  removeCoffee,
+  getStats,
+  getStreak,
+  getEntriesByType,
+  getEntriesForDate
+}: AppContentProps) {
   const [activeTab, setActiveTab] = useState<Tab>('main');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isDayDetailsOpen, setIsDayDetailsOpen] = useState(false);
-  
-  const {
-    data,
-    isLoaded,
-    username,
-    isSyncing,
-    setUser,
-    switchUser,
-    addCoffee,
-    removeCoffee,
-    getStats,
-    getStreak,
-    getEntriesByType,
-    getEntriesForDate
-  } = useCoffeeData();
 
   const { themeConfig } = useTheme();
 
@@ -66,6 +66,21 @@ function AppContent() {
 
   const handleDeleteEntry = (id: string) => {
     removeCoffee(id);
+  };
+
+  const handleExportData = () => {
+    if (!data || !username) return;
+
+    const dateStr = new Date().toISOString().split('T')[0];
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tazita-backup-${username}-${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const selectedDateEntries = selectedDate ? getEntriesForDate(selectedDate) : [];
@@ -228,9 +243,23 @@ function AppContent() {
                   onSetUsername={setUser}
                   onSwitchUser={switchUser}
                 />
+
+                <Button
+                  variant="outline"
+                  onClick={handleExportData}
+                  disabled={!data || totalEntries === 0}
+                  className="w-full rounded-xl mt-3"
+                  style={{
+                    borderColor: themeConfig.border,
+                    color: themeConfig.text
+                  }}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Descargar mis datos
+                </Button>
               </div>
-              
-              <div 
+
+              <div
                 className="rounded-2xl p-4 shadow-lg"
                 style={{ backgroundColor: '#FFFFFF' }}
               >
@@ -342,9 +371,11 @@ function AppContent() {
 }
 
 export default function HomePage() {
+  const coffeeData = useCoffeeData();
+
   return (
-    <ThemeProvider username={null}>
-      <AppContent />
+    <ThemeProvider username={coffeeData.username}>
+      <AppContent {...coffeeData} />
     </ThemeProvider>
   );
 }

@@ -11,8 +11,8 @@ Una aplicación web cozy y divertida para llevar el control de tus cafés diario
 - **📊 Estadísticas**: Visualizá tus preferencias y patrones de consumo
 - **🔥 Streak**: Seguimiento de días consecutivos tomando café
 - **📅 Calendario**: Vista mensual con todos tus registros
-- **💾 Persistencia**: Guardado automático en localStorage
-- **🔑 Código de recuperación**: Exportá e importá tus datos fácilmente
+- **💾 Persistencia**: Guardado automático en Supabase, con respaldo en localStorage
+- **📥 Backup**: Descargá tus datos como JSON desde Configuración cuando quieras
 - **📤 Compartir**: Generá imágenes bonitas para compartir tus stats en redes
 
 ## 🚀 Deploy en Vercel
@@ -71,7 +71,6 @@ my-app/
 │   ├── Counter.tsx
 │   ├── Streak.tsx
 │   ├── Stats.tsx
-│   ├── RecoveryCode.tsx
 │   └── ShareStats.tsx
 ├── hooks/                 # Custom hooks
 │   └── useCoffeeData.ts   # Manejo de datos
@@ -97,12 +96,16 @@ my-app/
 4. Opcional: agregá una nota
 5. ¡Listo! Se guarda automáticamente
 
-### Recuperar datos en otro dispositivo:
+### Usar la app en otro dispositivo:
 
 1. Andá a Configuración (⚙️)
-2. Copiá el código de recuperación o descargá el backup
-3. En el nuevo dispositivo, andá a Configuración > Cargar
-4. Pegá el código o el contenido del archivo
+2. Ingresá el mismo nombre de usuario que usaste antes
+3. Tus datos se cargan automáticamente desde Supabase
+
+### Hacer un backup:
+
+1. Andá a Configuración (⚙️)
+2. Tocá "Descargar mis datos" para guardar un archivo JSON con todos tus registros
 
 ## 🎁 Para tu novia
 
@@ -119,4 +122,4 @@ Hecho con ☕ y 🍮 - Para uso personal
 
 ---
 
-**Nota**: Los datos se guardan localmente en el navegador. Usá el código de recuperación para hacer backup!
+**Nota**: Los datos se guardan en Supabase y se respaldan localmente en el navegador. Usá la opción "Descargar mis datos" en Configuración para hacer un backup manual!

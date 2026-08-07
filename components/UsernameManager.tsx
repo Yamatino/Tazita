@@ -43,9 +43,13 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser, 
     setError('');
 
     try {
-      // Set theme before creating user
-      await setTheme(selectedTheme);
-      
+      // Only pre-apply the theme when there's no logged-in user yet (first-time setup).
+      // Otherwise this would overwrite the current user's theme before we know whether
+      // we're switching to a different existing account.
+      if (!currentUsername) {
+        await setTheme(selectedTheme);
+      }
+
       const result = await onSetUsername(inputUsername.trim(), selectedTheme);
       
       if (result.exists) {
@@ -71,11 +75,11 @@ export function UsernameManager({ currentUsername, onSetUsername, onSwitchUser, 
     setTimeout(() => setSuccess(false), 2000);
   };
 
-  const handleCreateNew = async () => {
-    // Force create new by switching to a modified username
-    const newUsername = inputUsername.trim() + '_new';
-    onSwitchUser(newUsername);
+  const handleCreateNew = () => {
+    // Don't auto-mutate the username (risks silently colliding with another
+    // real account) — ask the user to pick a genuinely different one instead.
     setShowConfirmDialog(false);
+    setError('Ese usuario ya existe. Ingresa un nombre diferente para crear una cuenta nueva.');
     setInputUsername('');
   };
 

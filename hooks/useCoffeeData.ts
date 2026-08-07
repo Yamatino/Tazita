@@ -30,9 +30,13 @@ export function useCoffeeData() {
     }
   }, [username]);
 
-  // Auto-save to Supabase when data changes
+  // Auto-save to Supabase when data changes.
+  // Guarded by `data.username === username`: when switching accounts, the
+  // `username` state can update a render before `data` catches up (loadUserData
+  // is async) - without this guard we'd briefly persist the previous user's
+  // data under the new username's key.
   useEffect(() => {
-    if (data && username && isLoaded) {
+    if (data && username && data.username === username && isLoaded) {
       const timeoutId = setTimeout(() => {
         syncToSupabase();
       }, 1000); // Debounce 1 second
@@ -41,15 +45,68 @@ export function useCoffeeData() {
     }
   }, [data, username, isLoaded]);
 
+  // Persist to localStorage immediately (undebounced) so the latest state
+  // survives an abrupt tab close even if the Supabase sync hasn't fired yet.
+  useEffect(() => {
+    if (data && username && data.username === username && isLoaded) {
+      localStorage.setItem(`tazita-data-${username}`, JSON.stringify(data));
+    }
+  }, [data, username, isLoaded]);
+
+  // Best-effort flush to Supabase when the tab is backgrounded/closed, so a
+  // pending debounced sync isn't lost.
+  useEffect(() => {
+    if (!data || !username || data.username !== username) return;
+
+    const flush = () => {
+      saveUserData(username, data).catch(error => {
+        console.error('Error flushing data on backgrounding:', error);
+      });
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') flush();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('pagehide', flush);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('pagehide', flush);
+    };
+  }, [data, username]);
+
   const loadUserData = async (user: string) => {
     try {
       const [userData, userTheme] = await Promise.all([
         getUserData(user),
         getUserTheme(user)
       ]);
-      
+
+      const localRaw = localStorage.getItem(`tazita-data-${user}`);
+      const localBackup: CoffeeData | null = localRaw ? JSON.parse(localRaw) : null;
+
       if (userData) {
-        setData(userData);
+        // Prefer whichever copy has more entries. This is a simple heuristic
+        // (not a full merge) to avoid losing entries that only made it to the
+        // local backup before Supabase could be reached - see syncToSupabase.
+        if (localBackup && localBackup.entries.length > userData.entries.length) {
+          setData(localBackup);
+          saveUserData(user, localBackup).catch(error => {
+            console.error('Error reconciling local backup to Supabase:', error);
+          });
+        } else {
+          setData(userData);
+        }
+      } else if (localBackup && localBackup.entries.length > 0) {
+        // Supabase has no row for this user, but we have a non-empty local
+        // backup (e.g. the row was lost, or Supabase is unreachable and
+        // returned null instead of throwing) - recover from it instead of
+        // silently starting a fresh empty account over real data.
+        setData(localBackup);
+        saveUserData(user, localBackup).catch(error => {
+          console.error('Error restoring local backup to Supabase:', error);
+        });
       } else {
         // Initialize new user
         const newData: CoffeeData = {
@@ -78,18 +135,15 @@ export function useCoffeeData() {
   };
 
   const syncToSupabase = async () => {
-    if (!data || !username) return;
-    
+    if (!data || !username || data.username !== username) return;
+
+    // Local persistence is handled by the immediate localStorage effect above.
     setIsSyncing(true);
     try {
       await saveUserData(username, data);
       setLastSync(new Date());
-      // Also save to localStorage as backup
-      localStorage.setItem(`tazita-data-${username}`, JSON.stringify(data));
     } catch (error) {
       console.error('Error syncing to Supabase:', error);
-      // Save to localStorage as fallback
-      localStorage.setItem(`tazita-data-${username}`, JSON.stringify(data));
     } finally {
       setIsSyncing(false);
     }
